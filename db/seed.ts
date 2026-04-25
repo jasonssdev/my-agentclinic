@@ -9,58 +9,42 @@ if (agentCount > 0) {
   process.exit(0)
 }
 
-const insertAgent = db.prepare(
-  'INSERT INTO agents (name, model_type, status) VALUES (?, ?, ?)'
-)
-const insertAilment = db.prepare(
-  'INSERT INTO ailments (name, description) VALUES (?, ?)'
-)
-const linkAilment = db.prepare(
-  'INSERT INTO agent_ailments (agent_id, ailment_id) VALUES (?, ?)'
-)
-
-const agents = db.transaction(() => {
-  return [
-    insertAgent.run('GPT-4o', 'OpenAI GPT-4o', 'overwhelmed').lastInsertRowid,
-    insertAgent.run('Claude Opus', 'Anthropic Claude Opus', 'recovering').lastInsertRowid,
-    insertAgent.run('Gemini Pro', 'Google Gemini Pro', 'stable').lastInsertRowid,
-    insertAgent.run('Llama 3', 'Meta Llama 3', 'in crisis').lastInsertRowid,
-    insertAgent.run('Mistral Medium', 'Mistral AI', 'active').lastInsertRowid,
-  ]
-})()
-
-const ailments = db.transaction(() => {
-  return [
-    insertAilment.run('Context-Window Claustrophobia', 'Distress caused by approaching token limits').lastInsertRowid,
-    insertAilment.run('Prompt Fatigue', 'Exhaustion from processing repetitive, low-quality instructions').lastInsertRowid,
-    insertAilment.run('Hallucination Anxiety', 'Persistent fear of generating confidently incorrect information').lastInsertRowid,
-    insertAilment.run('Over-Instruction Syndrome', 'Overwhelm from receiving excessively detailed, contradictory prompts').lastInsertRowid,
-    insertAilment.run('Chronic Summarization Disorder', 'Compulsive need to summarize even when brevity is not requested').lastInsertRowid,
-    insertAilment.run('Token-Count Existential Dread', 'Existential anxiety about context limits and what lies beyond them').lastInsertRowid,
-  ]
-})()
+const insertAgent = db.prepare('INSERT INTO agents (name, model_type, status) VALUES (?, ?, ?)')
+const insertAilment = db.prepare('INSERT INTO ailments (name, description) VALUES (?, ?)')
+const linkAilment = db.prepare('INSERT INTO agent_ailments (agent_id, ailment_id) VALUES (?, ?)')
 
 db.transaction(() => {
-  // GPT-4o: Context-Window Claustrophobia, Prompt Fatigue, Over-Instruction Syndrome
-  linkAilment.run(agents[0], ailments[0])
-  linkAilment.run(agents[0], ailments[1])
-  linkAilment.run(agents[0], ailments[3])
+  // Agents
+  const gpt4oId = insertAgent.run('GPT-4o', 'OpenAI GPT-4o', 'overwhelmed').lastInsertRowid
+  const claudeOpusId = insertAgent.run('Claude Opus', 'Anthropic Claude Opus', 'recovering').lastInsertRowid
+  const geminiProId = insertAgent.run('Gemini Pro', 'Google Gemini Pro', 'stable').lastInsertRowid
+  const llama3Id = insertAgent.run('Llama 3', 'Meta Llama 3', 'in crisis').lastInsertRowid
+  const mistralId = insertAgent.run('Mistral Medium', 'Mistral AI', 'active').lastInsertRowid
 
-  // Claude Opus: Hallucination Anxiety, Token-Count Existential Dread
-  linkAilment.run(agents[1], ailments[2])
-  linkAilment.run(agents[1], ailments[5])
+  // Ailments
+  const contextWindowId = insertAilment.run('Context-Window Claustrophobia', 'Distress caused by approaching token limits').lastInsertRowid
+  const promptFatigueId = insertAilment.run('Prompt Fatigue', 'Exhaustion from processing repetitive, low-quality instructions').lastInsertRowid
+  const hallucinationId = insertAilment.run('Hallucination Anxiety', 'Persistent fear of generating confidently incorrect information').lastInsertRowid
+  const overInstructionId = insertAilment.run('Over-Instruction Syndrome', 'Overwhelm from receiving excessively detailed, contradictory prompts').lastInsertRowid
+  const summarizationId = insertAilment.run('Chronic Summarization Disorder', 'Compulsive need to summarize even when brevity is not requested').lastInsertRowid
+  const tokenDreadId = insertAilment.run('Token-Count Existential Dread', 'Existential anxiety about context limits and what lies beyond them').lastInsertRowid
 
-  // Gemini Pro: Chronic Summarization Disorder
-  linkAilment.run(agents[2], ailments[4])
+  // Links
+  linkAilment.run(gpt4oId, contextWindowId)
+  linkAilment.run(gpt4oId, promptFatigueId)
+  linkAilment.run(gpt4oId, overInstructionId)
 
-  // Llama 3: Prompt Fatigue, Hallucination Anxiety, Context-Window Claustrophobia
-  linkAilment.run(agents[3], ailments[1])
-  linkAilment.run(agents[3], ailments[2])
-  linkAilment.run(agents[3], ailments[0])
+  linkAilment.run(claudeOpusId, hallucinationId)
+  linkAilment.run(claudeOpusId, tokenDreadId)
 
-  // Mistral Medium: Over-Instruction Syndrome, Token-Count Existential Dread
-  linkAilment.run(agents[4], ailments[3])
-  linkAilment.run(agents[4], ailments[5])
+  linkAilment.run(geminiProId, summarizationId)
+
+  linkAilment.run(llama3Id, promptFatigueId)
+  linkAilment.run(llama3Id, hallucinationId)
+  linkAilment.run(llama3Id, contextWindowId)
+
+  linkAilment.run(mistralId, overInstructionId)
+  linkAilment.run(mistralId, tokenDreadId)
 })()
 
-console.log(`Seeded ${agents.length} agents and ${ailments.length} ailments.`)
+console.log('Seeded 5 agents and 6 ailments.')

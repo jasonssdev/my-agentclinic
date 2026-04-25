@@ -23,6 +23,12 @@ describe('Layout', () => {
     expect(html).toContain('<footer')
   })
 
+  it('nav links to agents and ailments', () => {
+    const html = String(<Layout />)
+    expect(html).toContain('href="/agents"')
+    expect(html).toContain('href="/ailments"')
+  })
+
   it('renders children inside main', () => {
     const html = String(<Layout><p>content</p></Layout>)
     expect(html).toContain('<p>content</p>')

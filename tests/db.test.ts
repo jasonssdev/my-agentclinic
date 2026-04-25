@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { createDb } from '../src/db.js'
 
 describe('createDb', () => {
@@ -11,6 +11,12 @@ describe('createDb', () => {
     expect(names).toContain('agents')
     expect(names).toContain('ailments')
     expect(names).toContain('agent_ailments')
+  })
+
+  it('has foreign keys enabled', () => {
+    const db = createDb(':memory:')
+    const fkStatus = db.pragma('foreign_keys', { simple: true }) as number
+    expect(fkStatus).toBe(1)
   })
 
   it('can insert and query an agent', () => {

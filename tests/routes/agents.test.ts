@@ -4,27 +4,30 @@ import { createApp } from '../../src/app.js'
 import type { Hono } from 'hono'
 
 let app: Hono
+let appNoAilments: Hono
 
 beforeAll(() => {
+  // App with one agent that has two ailments
   const db = createDb(':memory:')
-
-  // Seed one agent and two ailments
   const agentId = db
     .prepare('INSERT INTO agents (name, model_type, status) VALUES (?, ?, ?)')
     .run('Test Agent', 'Test Model', 'overwhelmed').lastInsertRowid
-
   const ailmentId1 = db
     .prepare('INSERT INTO ailments (name, description) VALUES (?, ?)')
     .run('Prompt Fatigue', 'Exhaustion from bad prompts').lastInsertRowid
-
   const ailmentId2 = db
     .prepare('INSERT INTO ailments (name, description) VALUES (?, ?)')
     .run('Hallucination Anxiety', 'Fear of being wrong').lastInsertRowid
-
   db.prepare('INSERT INTO agent_ailments (agent_id, ailment_id) VALUES (?, ?)').run(agentId, ailmentId1)
   db.prepare('INSERT INTO agent_ailments (agent_id, ailment_id) VALUES (?, ?)').run(agentId, ailmentId2)
-
   app = createApp(db)
+
+  // App with one agent that has no ailments
+  const db2 = createDb(':memory:')
+  db2.prepare('INSERT INTO agents (name, model_type, status) VALUES (?, ?, ?)').run(
+    'Ailment-Free Agent', 'Test Model', 'stable'
+  )
+  appNoAilments = createApp(db2)
 })
 
 describe('GET /agents', () => {
@@ -61,8 +64,29 @@ describe('GET /agents/:id', () => {
     expect(body).toContain('Hallucination Anxiety')
   })
 
-  it('returns 404 for an unknown agent', async () => {
+  it('shows "No ailments on record" when agent has none', async () => {
+    const res = await appNoAilments.request('/agents/1')
+    const body = await res.text()
+    expect(body).toContain('No ailments on record')
+  })
+
+  it('returns 404 for an unknown id', async () => {
     const res = await app.request('/agents/9999')
+    expect(res.status).toBe(404)
+  })
+
+  it('returns 404 for id zero', async () => {
+    const res = await app.request('/agents/0')
+    expect(res.status).toBe(404)
+  })
+
+  it('returns 404 for a negative id', async () => {
+    const res = await app.request('/agents/-1')
+    expect(res.status).toBe(404)
+  })
+
+  it('returns 404 for a non-numeric id', async () => {
+    const res = await app.request('/agents/abc')
     expect(res.status).toBe(404)
   })
 })
