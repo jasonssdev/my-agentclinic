@@ -29,6 +29,8 @@ AgentClinic is a server-side TypeScript application. All rendering happens on th
 ## Testing
 
 - **Vitest** — fast, TypeScript-native, compatible with the rest of the stack
+- Tests live in `tests/` at the project root (mirroring the `src/` structure)
+- Run with `npm test`; watch mode via `npm run test:watch`
 
 ## Tooling
 
