@@ -33,7 +33,19 @@ Numbered task groups in dependency order. Each group is independently committabl
 - No layout component yet (that's Phase 2) — a single self-contained JSX response is fine
 - No CSS required — unstyled HTML is acceptable at this stage
 
-## 6. Smoke Check
+## 6. Main Layout Component
+
+- Create one file per component under `src/components/`:
+  - `Header.tsx` — site name and nav placeholder
+  - `Main.tsx` — wraps `{children}` in a `<main>` element
+  - `Footer.tsx` — copyright line
+  - `Layout.tsx` — imports and composes the three above into the full HTML shell
+- Create `public/styles.css` with basic reset and structural styles for the layout
+- Serve the `public/` directory as static assets via `serveStatic` from `@hono/node-server/serve-static`
+- `Layout` links to `/public/styles.css` in the `<head>`
+- Update the `/` route in `src/index.tsx` to use `Layout`
+
+## 7. Smoke Check
 
 - Run `npm run dev`
 - `curl http://localhost:3000` returns an HTML page with the clinic name and welcome content
