@@ -2,7 +2,7 @@
 
 ## Definition of Done
 
-This phase is complete when all checks below pass manually. No automated tests are required at this stage.
+This phase is complete when all checks below pass — both automated (`npm test`, `tsc --noEmit`) and manual (dev server, browser).
 
 ---
 
@@ -33,7 +33,15 @@ Open `http://localhost:3000` in a browser. Expected: a readable page showing at 
 - The one-line mission statement
 - A brief welcome message
 
-### 4. No TypeScript errors
+### 4. Tests pass
+
+```bash
+npm test
+```
+
+Expected: all Vitest tests pass, exits with code `0`.
+
+### 5. No TypeScript errors
 
 ```bash
 npx tsc --noEmit
@@ -45,4 +53,4 @@ Expected: exits with code `0`, no errors printed.
 
 ## Merge Criteria
 
-All three checks above pass. No regressions in existing files (there are none at this stage). The branch is clean and PR-ready.
+All five checks above pass. The branch is clean and PR-ready.
