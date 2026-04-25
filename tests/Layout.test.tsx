@@ -9,15 +9,16 @@ describe('Layout', () => {
     expect(html).toContain('<body')
   })
 
-  it('links the stylesheet', () => {
+  it('links PicoCSS and the local stylesheet', () => {
     const html = String(<Layout />)
-    expect(html).toContain('rel="stylesheet"')
-    expect(html).toContain('style.css')
+    expect(html).toContain('pico')
+    expect(html).toContain('styles.css')
   })
 
-  it('includes header, main, and footer', () => {
+  it('includes header, nav, main, and footer', () => {
     const html = String(<Layout />)
     expect(html).toContain('<header')
+    expect(html).toContain('<nav')
     expect(html).toContain('<main')
     expect(html).toContain('<footer')
   })
@@ -25,5 +26,15 @@ describe('Layout', () => {
   it('renders children inside main', () => {
     const html = String(<Layout><p>content</p></Layout>)
     expect(html).toContain('<p>content</p>')
+  })
+
+  it('uses the title prop in the page title', () => {
+    const html = String(<Layout title="Agents" />)
+    expect(html).toContain('Agents — AgentClinic')
+  })
+
+  it('falls back to AgentClinic when no title given', () => {
+    const html = String(<Layout />)
+    expect(html).toContain('<title>AgentClinic</title>')
   })
 })

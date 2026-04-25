@@ -1,5 +1,8 @@
-import { describe, it, expect } from 'vitest'
-import app from '../src/app.js'
+import { describe, it, expect, beforeAll } from 'vitest'
+import { createApp } from '../src/app.js'
+import { createDb } from '../src/db.js'
+
+const app = createApp(createDb(':memory:'))
 
 describe('GET /', () => {
   it('returns 200', async () => {
